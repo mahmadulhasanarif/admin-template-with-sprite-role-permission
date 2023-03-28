@@ -63,9 +63,18 @@ class RolePermissionSedder extends Seeder
                 // role Permissions
                 'admin.role.index',
                 'admin.role.create',
-                'admin.role.view',
                 'admin.role.edit',
                 'admin.role.delete',
+            ]
+        ],
+        [
+            'group_name' => 'Permissions',
+            'permissions' => [
+                //  Permissions
+                'admin.role_has_permission.index',
+                'admin.role_has_permission.create',
+                'admin.role_has_permission.edit',
+                'admin.role_has_permission.delete',
             ]
         ],
 

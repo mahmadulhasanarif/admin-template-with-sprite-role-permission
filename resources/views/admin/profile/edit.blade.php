@@ -11,11 +11,11 @@
             <div class="row mt-5 align-items-center">
               <div class="col-md-3 text-center mb-5">
                 <div class="avatar avatar-xl">
-                  <img src="@if($user->image == true) {{asset($user->image)}} @else {{asset('backend/assets/avatars/face-3.jpg')}}@endif"  alt="..." class="avatar-img rounded-circle">
+                  <img src="{{!empty($user->image) ? url($user->image) : url('images/admins/No_Image.jpg')}}" height="100px" width="120px" id="showImage" class="avatar-img rounded-circle">
                 </div>
                 <div class="custom-file mb-3 mt-3">
                     <label class="custom-file-label" for="validatedCustomFile">Choose file...</label>
-                    <input type="file" class="custom-file-input" name="image" value="{{old('image', $user->image)}}">
+                    <input type="file" class="custom-file-input" name="image" value="{{old('image', $user->image)}}" id="image">
                     <div class="invalid-feedback">Example invalid custom file feedback</div>
                   </div>
               </div>
@@ -23,13 +23,7 @@
                 <div class="row align-items-center">
                   <div class="col-md-7">
                     <h4 class="mb-1">{{$user->name}}</h4>
-                    <p class="small mb-3"><span class="badge badge-dark">
-                        @if ($user->address === true)
-                            {{$user->address}}
-                        @else
-                            Dhaka, Bangladesh
-                        @endif    
-                    </span></p>
+                    <p class="small mb-3"><span class="badge badge-dark">{{ !empty($user->address) ? $user->address : "Dhaka Bangladesh" }}</span></p>
                   </div>
                 </div>
                 <div class="row mb-4">
@@ -38,25 +32,13 @@
                   </div>
                   <div class="col">
                     <p class="small mb-0 text-muted">
-                        @if ($user->company === true)
-                            {{$user->company}}
-                        @else
-                            No Company Name Available
-                        @endif
+                      {{ !empty($user->phone) ? $user->phone : "+8801725-0000000" }}
                     </p>
                     <p class="small mb-0 text-muted">
-                        @if ($user->state === true)
-                        {{$user->state}}
-                        @else
-                            Mymensingh Sadar
-                        @endif
+                      {{ !empty($user->state->name) ? $user->state->name : "No State Availabe" }}
                     </p>
                     <p class="small mb-0 text-muted">
-                        @if ($user->zip === true)
-                        {{$user->zip}}
-                        @else
-                            2204
-                        @endif
+                      {{ !empty($user->zip) ? $user->zip : "2200" }}
                     </p>
                   </div>
                 </div>
@@ -78,8 +60,8 @@
             </div>
             <div class="form-row">
               <div class="form-group col-md-6">
-                <label for="inputCompany5">Company</label>
-                <input type="text" name="company" class="form-control" value="{{old('company', $user->company)}}" placeholder="Nec Urna Suscipit Ltd">
+                <label for="inputCompany5">Phone</label>
+                <input type="text" name="phone" class="form-control" value="{{old('phone', $user->phone)}}" placeholder="+881017-54535">
               </div>
               <div class="form-group col-md-4">
                 <label for="inputState5">State</label>
@@ -201,4 +183,16 @@
 
 @section('scripts')
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.3/jquery.min.js"></script>
+  <script>
+    $(document).ready(function(){
+      $('#image').change(function(e){
+        let reader = new FileReader();
+        reader.onload = function(e){
+          $('#showImage').attr('src',e.target.result);
+        }
+        reader.readAsDataURL(e.target.files[0]);
+      });
+    });
+  </script>
 @endsection

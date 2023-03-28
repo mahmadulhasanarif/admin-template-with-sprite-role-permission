@@ -14,9 +14,9 @@ use Illuminate\Support\Facades\Route;
 // Admin  login and register section
 
 Route::group(['middleware'=> ['guest:admin'], 'prefix'=>'admin', 'as'=>'admin.'],function () {
-    Route::get('register', [RegisteredAdminController::class, 'create'])->name('register');
+    // Route::get('register', [RegisteredAdminController::class, 'create'])->name('register');
 
-    Route::post('register', [RegisteredAdminController::class, 'store']);
+    // Route::post('register', [RegisteredAdminController::class, 'store']);
 
     Route::get('login', [AuthenticatedSessionController::class, 'create'])->name('login');
 

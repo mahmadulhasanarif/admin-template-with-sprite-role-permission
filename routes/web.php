@@ -4,6 +4,7 @@ use App\Http\Controllers\Admin\ProfileController;
 use App\Http\Controllers\Admin\RoleController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\Admin\AdminController;
+use App\Http\Controllers\Admin\RoleHasPermissionController;
 use App\Http\Controllers\User\ProfileController as UserProfileController;
 use App\Http\Controllers\User\UserController;
 use Illuminate\Support\Facades\Route;
@@ -20,7 +21,7 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::get('/', function () {
-    return view('welcome');
+    return view('admin.auth.login');
 });
 
 Route::group(['prefix' => 'user','middleware' => ['auth:web'], 'as'=>'user.'], function () {
@@ -70,6 +71,14 @@ Route::group(['prefix' => 'admin','middleware' => ['auth:admin'], 'as'=>'admin.'
     Route::get('role/edit/{id}', [RoleController::class, 'edit'])->name('role.edit');
     Route::post('role/update/{id}', [RoleController::class, 'update'])->name('role.update');
     Route::get('role/delete/{id}', [RoleController::class, 'delete'])->name('role.delete');
+
+    // Role Has Permission
+    Route::get('role_has_permission/index', [RoleHasPermissionController::class, 'roleView'])->name('role_has_permission.index');
+    Route::get('role_has_permission/create', [RoleHasPermissionController::class, 'create'])->name('role_has_permission.create');
+    Route::post('role_has_permission/store', [RoleHasPermissionController::class, 'store'])->name('role_has_permission.store');
+    Route::get('role_has_permission/edit/{group_name}', [RoleHasPermissionController::class, 'edit'])->name('role_has_permission.edit');
+    Route::post('role_has_permission/update/{id}', [RoleHasPermissionController::class, 'update'])->name('role_has_permission.update');
+    Route::get('role_has_permission/delete/{id}', [RoleHasPermissionController::class, 'delete'])->name('role_has_permission.delete');
 });
 
 require __DIR__.'/adminAuth.php';

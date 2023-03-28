@@ -8,17 +8,16 @@
       <div class="col-12">
         <div class="row">
           <div class="col-md-10">
-            <h2 class="mb-2 page-title">Data table</h2>
+            <h2 class="mb-2 page-title">Admin Data table</h2>
           </div>
           @if ($usr->can('admin.user.create') || $usr->status == 2)
 
           <div class="col-md-2">
-            <a style="float: right" class="btn mb-2 btn-success" href="{{route('admin.user.create')}}">User Create</a>
+            <a style="float: right" class="btn mb-2 btn-success" href="{{route('admin.user.create')}}">Admin Create</a>
           </div>
           
           @endif
         </div>
-        <p class="card-text">DataTables is a plug-in for the jQuery Javascript library. It is a highly flexible tool, built upon the foundations of progressive enhancement, that adds all of these advanced.</p>
         <div class="row my-4">
           <div class="col-md-12">
             <div class="card shadow">

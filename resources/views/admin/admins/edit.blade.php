@@ -54,6 +54,7 @@
                   
                 </select>
               </div>
+              
               <div class="form-group col-md-6">
                 <label for="inputZip5">Zip</label>
                 <input type="text" class="form-control" name="zip" value="{{old('zip', $admin->zip)}}" placeholder="2204">
@@ -64,18 +65,18 @@
             <div class="col-md-6 mb-3">
                 <label for="customFile">Image</label>
                 <div class="custom-file">
-                  <input type="file" class="custom-file-input" name="image">
+                  <input type="file" class="custom-file-input" id="image" name="image">
                   <label class="custom-file-label" for="customFile">Choose file...</label>
                     <div class="invalid-feedback"> You must input image before submitting. </div>
                 </div>
             </div>
 
             <div class="col-md-1"></div>
-            @if ($admin->image == true)
+
             <div class="form-group col-md-5">
-                <img src="{{asset($admin->image)}}" alt="">
+                <img src="{{!empty($admin->image)? url($admin->image) : url('images/admins/No_Image.jpg')}}" id="ShowImage" height="80px" width="120px">
             </div>
-            @endif
+
             </div>
             <button type="submit" class="btn mb-2 btn-secondary">Save Change</button>
           </form>
@@ -140,4 +141,19 @@
       </div> <!-- /.col-12 -->
     </div> <!-- .row -->
   </div> <!-- .container-fluid -->
+@endsection
+
+@section('scripts')
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.3/jquery.min.js"></script>
+  <script>
+    $(document).ready(function(){
+      $('#image').change(function(e){
+        let reader = new FileReader();
+        reader.onload = function(e){
+          $('#ShowImage').attr('src',e.target.result);
+        }
+        reader.readAsDataURL(e.target.files[0]);
+      });
+    });
+  </script>
 @endsection

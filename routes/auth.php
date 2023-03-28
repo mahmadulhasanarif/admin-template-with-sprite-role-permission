@@ -13,7 +13,7 @@ use Illuminate\Support\Facades\Route;
 
 // user  login and register section
 Route::group(['middleware'=> ['guest:web'], 'prefix'=>'user'],function () {
-    Route::get('register', [RegisteredUserController::class, 'create'])->name('register');
+    // Route::get('register', [RegisteredUserController::class, 'create'])->name('register');
 
     Route::post('register', [RegisteredUserController::class, 'store']);
 

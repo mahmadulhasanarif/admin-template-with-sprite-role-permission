@@ -1,16 +1,16 @@
 @extends('admin.layouts.master')
 @section('main')
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.3/jquery.min.js"></script>
 <div class="container-fluid">
     <div class="row justify-content-center">
       <div class="col-1"></div>
       <div class="col-11">
-        <h2 class="page-title">User Create Form</h2>
-        <p class="text-muted">Provide valuable, actionable feedback to your admins with HTML5 form validation</p>
+        <h2 class="page-title">Admin Create Form</h2>
         <div class="row">
           <div class="col-md-10">
             <div class="card shadow mb-4">
               <div class="card-header">
-                <strong class="card-title">Default Validation</strong>
+                <strong class="card-title">Admin Creator Form</strong>
               </div>
               <div class="card-body">
                 <form class="needs-validation" action="{{route('admin.user.store')}}" method="POST" enctype="multipart/form-data" novalidate>
@@ -58,14 +58,6 @@
                         <div class="invalid-feedback"> Please select a valid simple. </div>
                     </div>
 
-                    <div class="col-md-6 mb-3">
-                      <label for="customFile">Image</label>
-                      <div class="custom-file">
-                        <input type="file" class="custom-file-input" name="image">
-                        <label class="custom-file-label" for="customFile">Choose file...</label>
-                          <div class="invalid-feedback"> You must input image before submitting. </div>
-                      </div>
-                  </div>
 
                   <div class="col-md-6 mb-3">
                     <label for="multi-select2">Assign Role</label>
@@ -77,23 +69,12 @@
                         @error('roles')
                           <span class="text-danger">{{$message}}</span>
                         @enderror
-                </div>
-
-                <div class="col-md-6 mb-3">
-                  <label for="simple-select2">Zip</label>
-                  <div class="input-group">
-                    <input type="text" name="zip" class="form-control" placeholder="admin zip code">
-                    <div class="invalid-feedback"> Please choose zip code. </div>
                   </div>
 
-                  @error('zip')
-                    <span class="text-danger">{{$message}}</span>
-                  @enderror
-
-              </div>
+                
 
 
-                  <div class="col-md-6 mb-3">
+                  <div class="col-md-6">
                     <div class="form-group">
                       <label for="password">Password</label>
                       <input type="password" name="password" class="form-control" placeholder="Password" required>
@@ -104,7 +85,7 @@
                     @enderror
 
                   </div>
-                  <div class="col-md-6 mb-3">
+                  <div class="col-md-6 ">
                     <div class="form-group">
                       <label for="password">Confirm Password</label>
                       <input type="password" name="password_confirmation" class="form-control" placeholder="confirmation password" required>
@@ -115,11 +96,28 @@
                     @enderror
 
                   </div>
+
+                  
+                    <div class="col-md-6 mb-3">
+                      <label for="customFile">Image</label>
+                      <div class="custom-file">
+                        <input type="file" class="custom-file-input" id="image" name="image">
+                        <label class="custom-file-label" for="customFile">Choose file...</label>
+                          <div class="invalid-feedback"> You must input image before submitting. </div>
+                      </div>
+                    </div>
+
+                  <div class="col-md-1 mb-3"></div>
+                  <div class="col-md-5 mb-3">
+                    <img src="{{url('images/admins/No_Image.jpg')}}" id="showImage" width="100px" height="70px">
                   </div>
 
-                  <div class="form-group mb-3">
+                  
+                  <div class="form-group col-md-12 mb-3">
                     <label for="text-area">Address</label>
                     <textarea name="address"cols="30" rows="4" placeholder="Input Some text" class="form-control"></textarea>
+                  </div>
+
                 </div>
 
                   <div class="form-group">
@@ -130,7 +128,7 @@
                     </div>
                   </div>
 
-                  <button class="btn btn-primary" type="submit">Submit form</button>
+                  <button class="btn mb-2 btn-secondary" type="submit">Profile Submit</button>
                 </form>
               </div> <!-- /.card-body -->
             </div> <!-- /.card -->
@@ -139,4 +137,19 @@
       </div> <!-- /.col-12 col-lg-10 col-xl-10 -->
     </div>
 </div>
+@endsection
+
+@section('scripts')
+
+<script>
+  $(document).ready(function(){
+    $('#image').change(function(e){
+      let reader = new FileReader();
+      reader.onload = (e) =>{
+        $('#showImage').attr('src',e.target.result);
+      }
+      reader.readAsDataURL(e.target.files[0]);
+    });
+  });
+</script>
 @endsection

@@ -9,8 +9,9 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use RealRashid\SweetAlert\Facades\Alert;
-use Image;
 use Spatie\Permission\Models\Role;
+use Exception;
+use Image;
 
 class AdminController extends Controller
 {
@@ -40,9 +41,8 @@ class AdminController extends Controller
     public function create()
     {
         if (is_null($this->user) || !$this->user->can('admin.user.create')) {
-            abort(403, 'Sorry !! You are Unauthorized to create any role !');
+            abort(403, "SORRY !! You are not authorize to create admin");
         }
-
         $roles =Role::all();
         $admin = request()->user();
         $state = State::all();
@@ -51,166 +51,144 @@ class AdminController extends Controller
     
     public function store(Request $request)
     {
-        if (is_null($this->user) || !$this->user->can('admin.user.create')) {
-            abort(403, 'Sorry !! You are Unauthorized to create any role !');
-        }
-        
-        $this->validate($request, [
-            'name'=>'required|unique:users,name',
-            'email'=>'required|email|unique:users,email',
-            'password'=>'required|min:8|confirmed'
-        ]);
-
-        $image = $request->file('image');
-        if($image){
+        try{
+            $this->validate($request, [
+                'name'=>'required|unique:users,name',
+                'email'=>'required|email|unique:users,email',
+                'password'=>'required|min:8|confirmed'
+            ]);
+    
+            $admin = new Admin();
+            $admin->name = $request->name;
+            $admin->email = $request->email;
+            $admin->address = $request->address;
+            $admin->state_id = $request->state_id;
+            $admin->zip = $request->zip;
+            $admin->status = $request->status;
+            $admin->password = bcrypt($request->password);
             
-        $name = uniqid().'.'.$image->getClientOriginalExtension();
-        Image::make($image)->resize(150,120)->save('images/admins/'.$name);
-        $imgReq = "images/admins/".$name;
+            if ($request->file('image')) {
+                $image = $request->file('image');
+                $name = uniqid().'.'.$image->getClientOriginalExtension();
+                Image::make($image)->resize(150,120)->save('images/admins/'.$name);
+                $imgReq = "images/admins/".$name;
+                $admin->image = $imgReq;
+            }
 
-            $admin = Admin::create([
-                'name'=>$request->name,
-                'email'=>$request->email,
-                'address'=>$request->address,
-                'company'=>$request->company,
-                'state_id'=>$request->state_id,
-                'status'=>$request->status,
-                'zip'=>$request->zip,
-                'password'=>bcrypt($request->password),
-                'image'=>$imgReq
-            ]);
+            $admin->save();
+            
 
             if($request->roles){
                 $admin->assignRole($request->roles);
             }
-
-        }else{
-            $admin = Admin::create([
-                'name'=>$request->name,
-                'email'=>$request->email,
-                'address'=>$request->address,
-                'company'=>$request->company,
-                'state_id'=>$request->state_id,
-                'status'=>$request->status,
-                'zip'=>$request->zip,
-                'password'=>bcrypt($request->password)
-            ]);
-
-            if($request->roles){
-                $admin->assignRole($request->roles);
-            }
+            Alert::success('Profile created Successfully!', 'thanks for create new profile');
+            return redirect()->route('admin.user.index');
+        }catch(Exception $e){
+            Alert::error('SORRY !!', 'Admin Create Failed');
+            return redirect()->back();
         }
-
-        Alert::success('Profile Updated Successfully!', 'thanks for some updating your profile');
-
-        return redirect()->route('admin.user.index');
     }
 
     public function edit($id)
     {
-        if(Auth::user()->status == 2){
-            $roles  = Role::all();
-            $admin = Admin::findOrFail($id);
-            $state = State::all();
-            return view('admin.admins.edit', compact('admin', 'state', 'roles'));
+        if(is_null($this->user) || !$this->user->can('admin.user.delete')){
+            abort(403, 'Sorry !! You Are Unothoraize to edit admin');
         }
-        abort(403, 'Sorry !! You are Unauthorized to edit any role !');
+        $roles  = Role::all();
+        $admin = Admin::findOrFail($id);
+        $state = State::all();
+        return view('admin.admins.edit', compact('admin', 'state', 'roles'));
     }
 
     public function update(Request $request, $id)
     {
+        try{
+            $admin = Admin::find($id);
+            $admin->name = $request->name;
+            $admin->email = $request->email;
+            $admin->address = $request->address;
+            $admin->state_id = $request->state_id;
+            $admin->zip = $request->zip;
+            if ($request->file('image')) {
+                $old_img = $request->old_image;
+                if($old_img == true){
+                    @unlink($old_img);
+                }
 
-        $admin = Admin::findOrFail($id);
-
-        $image = $request->file('image');
-
-        if($image == true){
-            $name = uniqid().'.'.$image->getClientOriginalExtension();
-            Image::make($image)->resize(150,120)->save('images/admins/'.$name);
-            $imgReq = "images/admins/".$name;
-
-            $admin->update([
-                'name'=>$request->name,
-                'email'=>$request->email,
-                'address'=>$request->address,
-                'company'=>$request->company,
-                'state_id'=>$request->state_id,
-                'zip'=>$request->zip,
-                'image'=>$imgReq
-            ]);
-            
-
-            $old_img = $request->old_image;
-            if($old_img){
-                unlink($old_img);
+                $image = $request->file('image');
+                $name = uniqid().'.'.$image->getClientOriginalExtension();
+                Image::make($image)->resize(150,120)->save('images/admins/'.$name);
+                $imgReq = "images/admins/".$name;
+                $admin->image = $imgReq;
             }
-            Alert::success('Profile Updated Successfully!', 'thanks for some updating admin profile & delete old image');
-
-        }else{
-            $admin->update([
-                'name'=>$request->name,
-                'email'=>$request->email,
-                'address'=>$request->address,
-                'company'=>$request->company,
-                'state_id'=>$request->state_id,
-                'zip'=>$request->zip,
-            ]);
-
+            
+            $admin->save();
+            
             $admin->roles()->detach();
             if ($request->roles) {
                 $admin->assignRole($request->roles);
             }
-    
-            Alert::success('Admin Profile Updated Successfully!', 'thanks for some updating Admin profile');
+            Alert::success('Profile Updated Successfully!', 'thanks for updating admin profile');
+            return redirect()->route('admin.user.index');
+        }catch(Exception $e){
+            Alert::error('SORRY !!', 'Admin prfile updated Failed');
+            return redirect()->back();
         }
-
-        return redirect()->route('admin.user.index');
     }
 
     public function updatePassword(Request $request, $id)
     {
-        $admin = Admin::find($id);
+        try{
+            $admin = Admin::find($id);
+            $validatedData = $request->validate([
+                'current_password' => ['required', 'string'],
+                'password' => ['required', 'string', 'min:8'],
+                'password_confirmation' => ['required', 'string', 'min:8', 'same:password'],
+            ], [
+                'password.min' => 'The new password must be at least 8 characters long',
+                'password_confirmation.same' => 'The new password and confirmation do not match',
+            ]);
+        
+            if (!Hash::check($validatedData['current_password'], $admin->password)) {
+                return redirect()->back()->withErrors(['current_password' => 'The current password is incorrect']);
+            }
+        
+            if ($validatedData['password']) {
+                $admin->password = Hash::make($validatedData['password']);
+            }
 
-        $validatedData = $request->validate([
-            'current_password' => ['required', 'string'],
-            'password' => ['required', 'string', 'min:8'],
-            'password_confirmation' => ['required', 'string', 'min:8', 'same:password'],
-        ], [
-            'password.min' => 'The new password must be at least 8 characters long',
-            'password_confirmation.same' => 'The new password and confirmation do not match',
-        ]);
-    
-        if (!Hash::check($validatedData['current_password'], $admin->password)) {
-            return redirect()->back()->withErrors(['current_password' => 'The current password is incorrect']);
+            $admin->save();
+        
+            Alert::success('Password Updated Successfully!', 'Thanks for updating your Password');
+            return redirect()->back();
+        }catch(Exception $e){
+            Alert::error('SORRY !!', 'Admin prfile password updated Failed');
+            return redirect()->back();
         }
-    
-        if ($validatedData['password']) {
-            $admin->password = Hash::make($validatedData['password']);
-        }
-
-        $admin->save();
-    
-        Alert::success('Password Updated Successfully!', 'Thanks for updating your Password');
-        return redirect()->back();
     }
 
 
     public function delete($id)
     {
-        if(is_null($this->user) || !$this->user->can('admin.user.delete')){
-            abort(403, 'Sorry !! You Are Unothoraize admin then You can\'n delete');
+       try{
+            if(is_null($this->user) || !$this->user->can('admin.user.delete')){
+                abort(403, 'Sorry !! You Are Unothoraize admin then You can\'n delete');
+            }
+            $admin = Admin::findOrFail($id);
+
+            $old_img = $admin->image;
+
+            if($admin->image){
+                unlink($old_img);
+            }
+            $admin->roles()->detach();
+            $admin->delete();
+
+            Alert::success('Profile Deleted Successfully!', 'Deleted Your profile');
+            return redirect()->back();
+        }catch(Exception $e){
+            Alert::error('SORRY !!', 'Admin prfile deleted Failed');
+            return redirect()->back();
         }
-        $admin = Admin::findOrFail($id);
-
-        $old_img = $admin->image;
-
-        if($admin->image){
-            unlink($old_img);
-        }
-        $admin->roles()->detach();
-        $admin->delete();
-
-        Alert::success('Profile Deleted Successfully!', 'Deleted Your profile');
-        return redirect()->back();
     }
 }

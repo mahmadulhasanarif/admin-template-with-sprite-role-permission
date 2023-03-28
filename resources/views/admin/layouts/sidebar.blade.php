@@ -1,7 +1,7 @@
     <!-- nav bar -->
       <div class="w-100 mb-4 d-flex">
         <a class="navbar-brand mx-auto mt-2 flex-fill text-center" href="{{route('admin.dashboard')}}">
-          <img src="@if(Auth::user()->image == true) {{asset(Auth::user()->image)}} @else {{asset('backend/assets/avatars/face-3.jpg')}}@endif" class="rounded-circle" width="100px" height="90px">
+          <img src="{{!empty(Auth::user()->image) ? url(Auth::user()->image) : url('images/admins/No_Image.jpg')}}" class="rounded-circle" width="100px" height="90px">
         </a>
       </div>
       <ul class="navbar-nav flex-fill w-100 mb-2">
@@ -15,10 +15,13 @@
               <a class="nav-link pl-3" href="{{route('admin.dashboard')}}"><span class="ml-1 item-text">Default</span></a>
             </li>
             <li class="nav-item">
-              <a class="nav-link pl-3" href="{{route('admin.user.index')}}"><span class="ml-1 item-text">Users</span></a>
+              <a class="nav-link pl-3" href="{{route('admin.user.index')}}"><span class="ml-1 item-text">Admins</span></a>
             </li>
             <li class="nav-item">
               <a class="nav-link pl-3" href="{{route('admin.role.index')}}"><span class="ml-1 item-text">Roles</span></a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link pl-3" href="{{route('admin.role_has_permission.index')}}"><span class="ml-1 item-text">Permissions</span></a>
             </li>
           </ul>
         </li>
